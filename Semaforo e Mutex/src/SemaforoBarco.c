@@ -34,7 +34,7 @@ void hacker(void){
             up(&full); //Incrementa os lugares ocupados
 
         }
-    }
+    };
 }
 
 
@@ -64,7 +64,7 @@ void servo(void){
             up(&mutex); //Sai da região crítica
             up(&full); //Incrementa os lugares ocupados
         }
-    }
+    };
 }
 
 void rowBoat(){
@@ -83,10 +83,9 @@ void rowBoat(){
 
 
 
+//RESOLUÇÃO DO PROBLEMA PRODUTOR-CONSUMIDOR (USADO COMO BASE PARA A SOLUÇÃO);
 
-
-
-
+/*
 void producer(void)
 {
     int item;
@@ -113,3 +112,5 @@ void consumer(void){
        consume_item(item);
     }
 }
+*/
+
