@@ -2,16 +2,17 @@
 typedef int semaphore;
 semaphore mutex = 1; //Acesso a região crítica
 semaphore empty = N; //Controla os lugares vazios no barco
-semaphore full = 0; //Conta os lugares preenchidos no barco
+
 
 int contadorHacker = 0;
 int contadorServo = 0;
 
-void hacker(void){
+void hacker(void)
+{
 
     while(true){
         
-        if(full == 3){
+        if(empty == 1){
             if(contadorServo == 1 || contadorServo == 3){
                 sleep(); //NÃO FAZ NADA. ÚNICA POSSIBILIDADE É 1 PAR DE CADA!!!
             }
@@ -19,9 +20,13 @@ void hacker(void){
                 down(&empty); //Diminui os lugares vazios no barco
                 down(&mutex); //Entra na região crítica
                 board(); //Thread embarcou no barco
-                rowBoat(); //O barco vai remar. Na função rowBoat, todos os contadores voltam para seu estado inicial
+                if(empty == 0){
+                    rowBoat(); //O barco vai remar. Na função rowBoat, todos os contadores voltam para seu estado inicial
+                }
+                else{
+                    contadorHacker++;
+                }
                 up(&mutex); //Sai da região crítica
-                up(&full); //Incrementa os lugares ocupados
                 wakeUp(servo); //Acorda servo, caso ele esteja no sleep
             }
         }
@@ -29,9 +34,11 @@ void hacker(void){
             down(&empty); //Diminui os lugares vazios no barco
             down(&mutex); //Entra na região crítica
             board(); //Thread embarcou no barco
+                if(empty == 0){
+                    rowBoat();
+                }
             contadorHacker++; //Incrementa a quantidade de hackers no barco
             up(&mutex); //Sai da região crítica
-            up(&full); //Incrementa os lugares ocupados
 
         }
     };
@@ -42,7 +49,7 @@ void servo(void){
 
     while(true){
 
-        if(full == 3){
+        if(empty == 1){
             if(contadorHacker == 1 || contadorHacker == 3){
                 sleep()//NÃO FAZ NADA. ÚNICA POSSIBILIDADE É 1 PAR DE CADA!!!
             }
@@ -50,9 +57,13 @@ void servo(void){
                 down(&empty); //Diminui os lugares vazios no barco
                 down(&mutex); //Entra na região crítica
                 board(); //Thread embarcou no barco
-                rowBoat(); //O barco vai remar. Na função rowBoat, todos os contadores voltam para seu estado inicial
+                if(empty == 0){
+                    rowBoat(); //O barco vai remar. Na função rowBoat, todos os contadores voltam para seu estado inicial
+                }
+                else {
+                    contadorServo++;
+                }
                 up(&mutex); //Sai da região crítica
-                up(&full); //Incrementa os lugares ocupados
                 wakeUp(hacker); //acorda hacker, caso ele esteja no sleep
             }
         }
@@ -60,9 +71,11 @@ void servo(void){
             down(&empty); //Diminui os lugares vazios no barco
             down(&mutex); //Entra na região crítica
             board(); //Thread embarcou no barco
+                if(empty == 0){
+                    rowBoat();
+                }
             contadorServo++; //Incrementa a quantidade de servos no barco
             up(&mutex); //Sai da região crítica
-            up(&full); //Incrementa os lugares ocupados
         }
     };
 }
@@ -71,19 +84,19 @@ void rowBoat(){
 
     //Barco rema e depois as variáveis de controle voltam para o valor original;
 
-    semaphore mutex = 1; //Acesso a região crítica
-    semaphore empty = N; //Controla os lugares vazios no barco
-    semaphore full = 0; //Conta os lugares preenchidos no barco
+    //Realizo o UP em cada thread do barco
+    for(int i = 0; i < N; i++){
+        up(&empty);
+    }
 
-    int contadorHacker = 0;
-    int contadorServo = 0;
+    contadorHacker = 0;
+    contadorServo = 0;
 }
 
 
 
 
-
-//RESOLUÇÃO DO PROBLEMA PRODUTOR-CONSUMIDOR (USADO COMO BASE PARA A SOLUÇÃO);
+//RESOLUÇÃO DO PROBLEMA PRODUTOR-CONSUMIDOR (USADO COMO BASE PARA A SOLUÇÃO ACIMA);
 
 /*
 void producer(void)
